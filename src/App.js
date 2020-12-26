@@ -96,13 +96,11 @@ export class App extends React.Component {
             <input
                 type='number'
                 min='0'
-                max={this.state.nameList.length}
                 ref={this.quantityInputFirst}
             />
             <input
                 type='number'
                 min='0'
-                max={this.state.nameList.length}
                 ref={this.quantityInputSecond}
             />
             <button

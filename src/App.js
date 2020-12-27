@@ -2,18 +2,18 @@ import './App.css';
 import React from 'react';
 const crypto = require('crypto');
 
-function pickNFrom(list, number) {
-    let src = list.slice();
-    let res = [];
-    if (src.length < number) {
+function pickNFrom(list, n) {
+    let remain = list.slice();
+    let chosen = [];
+    if (remain.length < n) {
         throw new Error('Too many selections');
     }
-    while (res.length < number) {
-        let index = crypto.randomInt(src.length);
-        res.push(JSON.parse(JSON.stringify(src[index])));
-        src.splice(index, 1);
+    while (chosen.length < n) {
+        let index = crypto.randomInt(remain.length);
+        chosen.push(JSON.parse(JSON.stringify(remain[index])));
+        remain.splice(index, 1);
     }
-    return { chosen: res, remain: src };
+    return {chosen, remain};
 }
 
 class DisplayPanel extends React.Component {
@@ -103,18 +103,22 @@ export class App extends React.Component {
                 min='0'
                 ref={this.quantityInputSecond}
             />
-            <button
+            <button className='button'
                 onClick={(e)=>{
                     e.stopPropagation();
                     this.startLottery(1);
                 }}
             >开始抽一等奖</button>
-            <button
+            <button className='button'
                 onClick={(e)=>{
                     e.stopPropagation();
                     this.startLottery(2);
                 }}
             >开始抽二等奖</button>
+            <a
+                href={`data:text/plain;charset=utf8,${encodeURIComponent('test text')}`}
+                download='test.csv'
+            >测试文件下载</a>
             <DisplayPanel ref={this.display}/>
             {this.state.nameListHash}
         </div>

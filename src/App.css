@@ -1,5 +1,138 @@
 .App {
   text-align: center;
+  display: grid;
+  height: 100vh;
+  width: 100vw;
+  grid-template-columns: 38% 62%;
+  grid-template-rows: 2cm auto;
+}
+
+.tool-bar {
+  grid-row: 1;
+  grid-column: 1 / 4;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: #4d4d4d;
+}
+
+.quantity-input-label {
+  margin-right: 10px;
+  color: white;
+  font-size: x-large;
+}
+
+.quantity-input {
+  height: 0.8cm;
+  width: 2cm;
+  margin: 10px;
+  font-size: x-large;
+  text-align: center;
+  border:none;
+  border-bottom: solid 2px;
+  background-color: transparent;
+  color: white;
+}
+
+.button-start {
+  color:white;
+  margin: 10px;
+  font-size:x-large;
+}
+
+.button-next {
+  color:white;
+  margin: 10px;
+  margin-right: 50px;
+  font-size: x-large;
+}
+
+.left-part {
+  grid-column: 1;
+  grid-row: 2;
+  display:grid;
+  grid-template-rows: 90% 10%;
+  grid-template-columns: auto;
+  border-right: solid 2px gray;
+}
+
+
+
+.prize-display {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+}
+
+.prize-text {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content:center;
+}
+
+.prize-name {
+  font-size: xx-large;
+  margin:10px;
+}
+
+.prize-description {
+  font-size: xx-large;
+  margin: 10px;
+}
+
+.prize-price {
+  font-size: large;
+  margin:10px;
+}
+
+.prize-image {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.hash-aera {
+  grid-row: 2;
+  grid-column: 1;
+  text-align: left;
+  margin-left: 30px;
+  font-size: large;
+  line-break: loose;
+  text-align: center;
+}
+
+.right-part {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.name-display {
+  margin: 75px;
+  align-self: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.name {
+  margin: 10px;
+  margin-top:3px;
+  margin-bottom: 3px;
+  font-size: x-large;
+  color:darkgray;
+}
+
+.name-confirmed {
+  margin: 10px;
+  margin-top:3px;
+  margin-bottom: 3px;
+  font-size: x-large;
 }
 
 

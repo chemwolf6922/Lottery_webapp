@@ -2,7 +2,7 @@ import './App.css';
 import React from 'react';
 const crypto = require('crypto');
 
-const FPS = 10;
+const FPS = 20;
 
 function randomInt(range) {
     // remove the bias by removing the uneven part.
@@ -41,15 +41,20 @@ class PrizeDisplay extends React.Component {
             prize: null
         }
     }
+    async displayPrize(prize) {
+        return new Promise(resolve => this.setState({ ...this.state, prize }, resolve));
+    }
     render() {
         if (this.state.prize !== null) {
             return <div
                 className='prize-display'
             >
-                {this.state.prize.name}
-                {this.state.prize.description}
-                <img src={this.state.prize.image} />
-                {`￥${this.state.prize.price}`}
+                <img className='prize-image' src={this.state.prize.image} />
+                <div className='prize-text'>
+                    <div className='prize-name'>{this.state.prize.name}</div>
+                    <div className='prize-description'>{this.state.prize.description}</div>
+                    <div className='prize-price'>{`￥${this.state.prize.price}`}</div>
+                </div>
             </div>
         } else {
             // config not loaded
@@ -70,15 +75,16 @@ class NameDisplay extends React.Component {
         return new Promise(resolve => this.setState({ ...this.state, names, confirmed }, resolve));
     }
     render() {
-        let len = this.state.names.length;
-        let newFontSize = 16;
         return <div
             className='name-display'
-            style={{
-                fontSize:`${newFontSize}px`
-            }}
         >
-            {this.state.names.map(n => n.name).join('  ')}
+            {this.state.names.map(n => {
+                if (this.state.confirmed) {
+                    return <div className='name-confirmed' key={n.name}>{n.name}</div>;
+                } else {
+                    return <div className='name' key={n.name}>{n.name}</div>;
+                }
+            })}
         </div>
     }
 }
@@ -190,17 +196,19 @@ export class App extends React.Component {
         let hash = crypto.createHash('sha1').update(this.result).digest('hex').toUpperCase();
         return new Promise(resolve => this.setState({ ...this.state, finished: true, resultHash: hash }, resolve));
     }
-    nextPrize() {
+    async nextPrize() {
         if (this.state.configLoaded) {
             if (this.currentPrizeCnt === null) {
                 this.currentPrizeCnt = 0;
                 this.currentPrize = this.prizeList[this.currentPrizeCnt];
-                this.prizeDisplay.current.setState({ ...this.prizeDisplay.state, prize: this.currentPrize });
+                await this.prizeDisplay.current.displayPrize(this.currentPrize);
+                await this.nameDisplay.current.displayNames([], false);
             } else if (this.currentPrize.finished) {
                 if (this.currentPrizeCnt < (this.prizeList.length - 1)) {
                     this.currentPrizeCnt++;
                     this.currentPrize = this.prizeList[this.currentPrizeCnt];
-                    this.prizeDisplay.current.setState({ ...this.prizeDisplay.state, prize: this.currentPrize });
+                    await this.prizeDisplay.current.displayPrize(this.currentPrize);
+                    await this.nameDisplay.current.displayNames([], false);
                 }
             }
         }
@@ -213,48 +221,60 @@ export class App extends React.Component {
     }
     render() {
         return <div className='App'>
-            <input
-                className='file-upload'
-                type='file'
-                ref={this.fileUpload}
-                webkitdirectory=""
-                disabled={this.state.configLoaded}
-                hidden={this.state.configLoaded}
-                onChange={(e) => {
-                    let files = [];
-                    for (let i = 0; i < e.target.files.length; i++) {
-                        files.push(e.target.files[i]);
-                    }
-                    this.loadConfigFiles(files);
-                }}
-            />
-            <label>奖项人数</label>
-            <input
-                type='number'
-                min='0'
-                ref={this.quantityInput}
-            />
-            <button className='button'
-                onClick={(e) => {
-                    e.stopPropagation();
-                    this.nextPrize();
-                }}
-            >下一个奖项</button>
-            <button className='button'
-                onClick={(e) => {
-                    e.stopPropagation();
-                    this.startLottery();
-                }}
-            >开始抽奖</button>
-            <a
-                hidden={!this.state.finished}
-                href={`data:text/plain;charset=utf8,${encodeURIComponent(this.result)}`}
-                download='result.json'
-            >抽奖结果下载</a>
-            <NameDisplay ref={this.nameDisplay} />
-            <PrizeDisplay ref={this.prizeDisplay} />
-            {`参与人员名单哈希(SHA1): ${this.state.nameListHash}`}
-            {`获奖人员名单哈希(SHA1): ${this.state.resultHash}`}
+            <div className='tool-bar'>
+                <input
+                    className='file-upload'
+                    type='file'
+                    ref={this.fileUpload}
+                    webkitdirectory=""
+                    disabled={this.state.configLoaded}
+                    hidden={this.state.configLoaded}
+                    onChange={(e) => {
+                        let files = [];
+                        for (let i = 0; i < e.target.files.length; i++) {
+                            files.push(e.target.files[i]);
+                        }
+                        this.loadConfigFiles(files);
+                    }}
+                />
+                <a
+                    hidden={!this.state.finished}
+                    href={`data:text/plain;charset=utf8,${encodeURIComponent(this.result)}`}
+                    download='result.json'
+                >抽奖结果下载</a>
+                <div className='quantity-input-label'>人数</div>
+                <input
+                    className='quantity-input'
+                    type='number'
+                    min='0'
+                    ref={this.quantityInput}
+                />
+                <div className='button-start'
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.startLottery();
+                    }}
+                >开始抽奖</div>
+                <div className='button-next'
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.nextPrize();
+                    }}
+                >下一个奖项</div>
+            </div>
+            <div className='left-part'>
+                <PrizeDisplay ref={this.prizeDisplay} />
+                <div className='hash-aera'>
+                    <br />
+                    {`参与名单哈希(SHA1): ${this.state.nameListHash}`}
+                    <br />
+                    {`获奖名单哈希(SHA1): ${this.state.resultHash}`}
+                    <br />
+                </div>
+            </div>
+            <div className='right-part'>
+                <NameDisplay ref={this.nameDisplay} />
+            </div>
         </div>
     }
 }

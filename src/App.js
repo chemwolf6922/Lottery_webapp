@@ -49,7 +49,7 @@ class PrizeDisplay extends React.Component {
             return <div
                 className='prize-display'
             >
-                <img className='prize-image' src={this.state.prize.image} />
+                <img className='prize-image' alt='' src={this.state.prize.image} />
                 <div className='prize-text'>
                     <div className='prize-name'>{this.state.prize.name}</div>
                     <div className='prize-description'>{this.state.prize.description}</div>
@@ -72,7 +72,9 @@ class NameDisplay extends React.Component {
         }
     }
     async displayNames(names, confirmed) {
-        return new Promise(resolve => this.setState({ ...this.state, names, confirmed }, resolve));
+        let nameToD = names.slice();
+        nameToD.sort((a,b)=>a.name.localeCompare(b.name));
+        return new Promise(resolve => this.setState({ ...this.state, names:nameToD, confirmed }, resolve));
     }
     render() {
         return <div
